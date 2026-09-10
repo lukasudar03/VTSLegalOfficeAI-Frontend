@@ -6,9 +6,11 @@ interface DocumentSidebarProps {
   selectedId: string | null
   uploading: boolean
   processingId: string | null
+  username: string
   onSelect: (id: string) => void
   onUpload: (file: File) => void
   onProcess: (id: string) => void
+  onLogout: () => void
 }
 
 const statusLabels: Record<DocumentDto['status'], string> = {
@@ -32,9 +34,11 @@ export function DocumentSidebar({
   selectedId,
   uploading,
   processingId,
+  username,
   onSelect,
   onUpload,
   onProcess,
+  onLogout,
 }: DocumentSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -65,6 +69,13 @@ export function DocumentSidebar({
           hidden
           onChange={handleFileChange}
         />
+      </div>
+
+      <div className="user-bar">
+        <span className="user-name">{username}</span>
+        <button type="button" className="logout-button" onClick={onLogout}>
+          Odjavi se
+        </button>
       </div>
 
       {documents.length === 0 && (

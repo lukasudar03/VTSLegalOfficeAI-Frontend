@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
-import { askQuestion, getDocuments, processDocument, uploadDocument } from './api/client'
+import { ApiError, askQuestion, getDocuments, processDocument, uploadDocument } from './api/client'
 import type { ChatMessage } from './api/chat'
 import type { DocumentDto } from './api/types'
 import { DocumentSidebar } from './components/DocumentSidebar'
 import { QaPanel } from './components/QaPanel'
+import { LoginForm } from './components/LoginForm'
+import { useAuth } from './auth/AuthContext'
 import './App.css'
 
 function App() {
+  const { session, logout } = useAuth()
+
   const [documents, setDocuments] = useState<DocumentDto[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -16,46 +20,70 @@ function App() {
   const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
-    refreshDocuments()
-  }, [])
+    setDocuments([])
+    setSelectedId(null)
+    setChatByDocument({})
+    setLoadError(null)
 
-  async function refreshDocuments() {
+    if (session) {
+      refreshDocuments(session.token)
+    }
+  }, [session?.token])
+
+  function handleAuthError(error: unknown): boolean {
+    if (error instanceof ApiError && error.status === 401) {
+      logout()
+      return true
+    }
+    return false
+  }
+
+  async function refreshDocuments(token: string) {
     try {
-      const docs = await getDocuments()
+      const docs = await getDocuments(token)
       setDocuments(docs)
       setLoadError(null)
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : 'Neuspešno učitavanje dokumenata.')
+      if (!handleAuthError(error)) {
+        setLoadError(error instanceof Error ? error.message : 'Neuspešno učitavanje dokumenata.')
+      }
     }
   }
 
   async function handleUpload(file: File) {
+    if (!session) return
     setUploading(true)
     try {
-      const uploaded = await uploadDocument(file)
-      await refreshDocuments()
+      const uploaded = await uploadDocument(session.token, file)
+      await refreshDocuments(session.token)
       setSelectedId(uploaded.id)
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : 'Otpremanje nije uspelo.')
+      if (!handleAuthError(error)) {
+        setLoadError(error instanceof Error ? error.message : 'Otpremanje nije uspelo.')
+      }
     } finally {
       setUploading(false)
     }
   }
 
   async function handleProcess(id: string) {
+    if (!session) return
     setProcessingId(id)
     try {
-      await processDocument(id)
-      await refreshDocuments()
+      await processDocument(session.token, id)
+      await refreshDocuments(session.token)
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : 'Obrada dokumenta nije uspela.')
+      if (!handleAuthError(error)) {
+        setLoadError(error instanceof Error ? error.message : 'Obrada dokumenta nije uspela.')
+      }
     } finally {
       setProcessingId(null)
     }
   }
 
   async function handleAsk(question: string) {
-    if (!selectedId) return
+    if (!session || !selectedId) return
+    const token = session.token
     const documentId = selectedId
     const messageId = crypto.randomUUID()
 
@@ -66,7 +94,7 @@ function App() {
     setAsking(true)
 
     try {
-      const result = await askQuestion(documentId, question)
+      const result = await askQuestion(token, documentId, question)
       setChatByDocument((prev) => ({
         ...prev,
         [documentId]: (prev[documentId] ?? []).map((m) =>
@@ -76,6 +104,8 @@ function App() {
         ),
       }))
     } catch (error) {
+      if (handleAuthError(error)) return
+
       setChatByDocument((prev) => ({
         ...prev,
         [documentId]: (prev[documentId] ?? []).map((m) =>
@@ -93,6 +123,10 @@ function App() {
     }
   }
 
+  if (!session) {
+    return <LoginForm />
+  }
+
   const selectedDocument = documents.find((d) => d.id === selectedId) ?? null
 
   return (
@@ -102,9 +136,11 @@ function App() {
         selectedId={selectedId}
         uploading={uploading}
         processingId={processingId}
+        username={session.username}
         onSelect={setSelectedId}
         onUpload={handleUpload}
         onProcess={handleProcess}
+        onLogout={logout}
       />
 
       {loadError && <div className="error-banner">{loadError}</div>}

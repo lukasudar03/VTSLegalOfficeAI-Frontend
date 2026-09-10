@@ -23,3 +23,9 @@ export interface AskAnswerResponseDto {
   answer: string
   sources: ChunkSourceDto[]
 }
+
+export interface LoginResponseDto {
+  token: string
+  expiresAt: string
+  username: string
+}
