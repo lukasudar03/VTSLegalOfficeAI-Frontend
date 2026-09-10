@@ -154,7 +154,11 @@ function App() {
       {loadError && <div className="error-banner">{loadError}</div>}
 
       {view === 'admin' && session.isAdmin ? (
-        <AdminPanel token={session.token} onBack={() => setView('documents')} />
+        <AdminPanel
+          token={session.token}
+          currentUsername={session.username}
+          onBack={() => setView('documents')}
+        />
       ) : (
         <QaPanel
           document={selectedDocument}
