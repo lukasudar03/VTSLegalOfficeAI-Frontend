@@ -26,6 +26,7 @@ function App() {
     setSelectedId(null)
     setChatByDocument({})
     setLoadError(null)
+    setView('documents')
 
     if (session) {
       refreshDocuments(session.token)
@@ -152,7 +153,7 @@ function App() {
 
       {loadError && <div className="error-banner">{loadError}</div>}
 
-      {view === 'admin' ? (
+      {view === 'admin' && session.isAdmin ? (
         <AdminPanel token={session.token} onBack={() => setView('documents')} />
       ) : (
         <QaPanel
