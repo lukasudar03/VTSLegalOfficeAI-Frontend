@@ -28,4 +28,12 @@ export interface LoginResponseDto {
   token: string
   expiresAt: string
   username: string
+  isAdmin: boolean
+}
+
+export interface UserDto {
+  id: string
+  username: string
+  isAdmin: boolean
+  createdAt: string
 }

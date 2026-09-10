@@ -5,6 +5,7 @@ import type { DocumentDto } from './api/types'
 import { DocumentSidebar } from './components/DocumentSidebar'
 import { QaPanel } from './components/QaPanel'
 import { LoginForm } from './components/LoginForm'
+import { AdminPanel } from './components/AdminPanel'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -18,12 +19,14 @@ function App() {
   const [asking, setAsking] = useState(false)
   const [chatByDocument, setChatByDocument] = useState<Record<string, ChatMessage[]>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [view, setView] = useState<'documents' | 'admin'>('documents')
 
   useEffect(() => {
     setDocuments([])
     setSelectedId(null)
     setChatByDocument({})
     setLoadError(null)
+    setView('documents')
 
     if (session) {
       refreshDocuments(session.token)
@@ -137,20 +140,29 @@ function App() {
         uploading={uploading}
         processingId={processingId}
         username={session.username}
-        onSelect={setSelectedId}
+        isAdmin={session.isAdmin}
+        onSelect={(id) => {
+          setView('documents')
+          setSelectedId(id)
+        }}
         onUpload={handleUpload}
         onProcess={handleProcess}
         onLogout={logout}
+        onOpenAdmin={() => setView('admin')}
       />
 
       {loadError && <div className="error-banner">{loadError}</div>}
 
-      <QaPanel
-        document={selectedDocument}
-        messages={selectedId ? (chatByDocument[selectedId] ?? []) : []}
-        asking={asking}
-        onAsk={handleAsk}
-      />
+      {view === 'admin' && session.isAdmin ? (
+        <AdminPanel token={session.token} onBack={() => setView('documents')} />
+      ) : (
+        <QaPanel
+          document={selectedDocument}
+          messages={selectedId ? (chatByDocument[selectedId] ?? []) : []}
+          asking={asking}
+          onAsk={handleAsk}
+        />
+      )}
     </div>
   )
 }
