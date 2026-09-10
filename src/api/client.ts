@@ -1,4 +1,4 @@
-import type { AskAnswerResponseDto, DocumentDto, LoginResponseDto } from './types'
+import type { AskAnswerResponseDto, DocumentDto, LoginResponseDto, UserDto } from './types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5211'
 
@@ -69,5 +69,19 @@ export function askQuestion(token: string, id: string, question: string): Promis
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
     body: JSON.stringify({ question }),
+  }).then((r) => handleResponse(r))
+}
+
+export function getUsers(token: string): Promise<UserDto[]> {
+  return fetch(`${API_BASE_URL}/api/auth/users`, {
+    headers: authHeaders(token),
+  }).then((r) => handleResponse(r))
+}
+
+export function createUser(token: string, username: string, password: string): Promise<UserDto> {
+  return fetch(`${API_BASE_URL}/api/auth/users`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ username, password }),
   }).then((r) => handleResponse(r))
 }

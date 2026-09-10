@@ -5,6 +5,7 @@ export interface Session {
   token: string
   username: string
   expiresAt: string
+  isAdmin: boolean
 }
 
 interface AuthContextValue {
@@ -43,7 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(username: string, password: string) {
     const result = await loginRequest(username, password)
-    setSession({ token: result.token, username: result.username, expiresAt: result.expiresAt })
+    setSession({
+      token: result.token,
+      username: result.username,
+      expiresAt: result.expiresAt,
+      isAdmin: result.isAdmin,
+    })
   }
 
   function logout() {
