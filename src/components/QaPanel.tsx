@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ChatMessage } from '../api/chat'
 import type { DocumentDto } from '../api/types'
+import { EmptyState } from './EmptyState'
 
 interface QaPanelProps {
   document: DocumentDto | null
@@ -14,8 +15,8 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
 
   if (!document) {
     return (
-      <main className="qa-panel qa-panel-empty">
-        <p>Izaberi dokument sa leve strane, ili otpremi novi PDF.</p>
+      <main className="qa-panel">
+        <EmptyState />
       </main>
     )
   }
