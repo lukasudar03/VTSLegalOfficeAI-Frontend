@@ -34,6 +34,8 @@ export interface LoginResponseDto {
 export interface UserDto {
   id: string
   username: string
+  email: string
   isAdmin: boolean
+  emailVerified: boolean
   createdAt: string
 }

@@ -23,6 +23,7 @@ export function AdminPanel({ token, onBack }: AdminPanelProps) {
   const [listError, setListError] = useState<string | null>(null)
 
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState<string | null>(null)
@@ -49,8 +50,9 @@ export function AdminPanel({ token, onBack }: AdminPanelProps) {
     setCreating(true)
 
     try {
-      await createUser(token, username, password)
+      await createUser(token, username, email, password)
       setUsername('')
+      setEmail('')
       setPassword('')
       await refreshUsers()
     } catch (error) {
@@ -72,11 +74,19 @@ export function AdminPanel({ token, onBack }: AdminPanelProps) {
       <div className="admin-content">
         <section className="admin-section">
           <h3>Novi korisnik</h3>
+          <p className="admin-hint">Korisnik će dobiti email sa linkom za aktivaciju naloga.</p>
           <form className="admin-create-form" onSubmit={handleSubmit}>
             <input
               placeholder="Korisničko ime"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              autoComplete="off"
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               autoComplete="off"
             />
             <input
@@ -86,7 +96,7 @@ export function AdminPanel({ token, onBack }: AdminPanelProps) {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="new-password"
             />
-            <button type="submit" disabled={creating || !username || !password}>
+            <button type="submit" disabled={creating || !username || !email || !password}>
               {creating ? 'Kreiranje…' : 'Kreiraj korisnika'}
             </button>
           </form>
@@ -102,8 +112,12 @@ export function AdminPanel({ token, onBack }: AdminPanelProps) {
             <ul className="admin-user-list">
               {users.map((user) => (
                 <li key={user.id}>
-                  <span className="admin-user-name">{user.username}</span>
+                  <div className="admin-user-info">
+                    <span className="admin-user-name">{user.username}</span>
+                    <span className="admin-user-email">{user.email}</span>
+                  </div>
                   {user.isAdmin && <span className="admin-badge">Admin</span>}
+                  {!user.emailVerified && <span className="admin-badge pending">Neverifikovan</span>}
                   <span className="document-meta">{formatDate(user.createdAt)}</span>
                 </li>
               ))}

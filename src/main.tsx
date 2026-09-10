@@ -3,11 +3,18 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './auth/AuthContext.tsx'
+import { VerifyEmailPage } from './components/VerifyEmailPage.tsx'
+
+const isVerifyEmailRoute = window.location.pathname === '/verify-email'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    {isVerifyEmailRoute ? (
+      <VerifyEmailPage />
+    ) : (
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    )}
   </StrictMode>,
 )
