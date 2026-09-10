@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ApiError, verifyEmail } from '../api/client'
 
 type Status = 'verifying' | 'success' | 'error'
@@ -6,8 +6,15 @@ type Status = 'verifying' | 'success' | 'error'
 export function VerifyEmailPage() {
   const [status, setStatus] = useState<Status>('verifying')
   const [message, setMessage] = useState('')
+  const requestedRef = useRef(false)
 
   useEffect(() => {
+    // React's StrictMode runs effects twice in development; without this guard the
+    // second call would reuse the (already-consumed) token and overwrite a successful
+    // verification with a false "invalid or expired" error.
+    if (requestedRef.current) return
+    requestedRef.current = true
+
     const token = new URLSearchParams(window.location.search).get('token')
 
     if (!token) {
