@@ -1,7 +1,52 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Top bar */
+
+.top-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar-brand {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-bar-link {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.top-bar-link:hover {
+  background: var(--accent-bg);
+}
+
 .app-layout {
   display: grid;
   grid-template-columns: 320px 1fr;
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Sidebar */
@@ -24,15 +69,6 @@
 .sidebar-header h2 {
   font-size: 18px;
   margin: 0;
-}
-
-.user-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--border);
 }
 
 .user-name {
@@ -302,7 +338,7 @@
 .qa-panel {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -435,27 +471,10 @@
 
 /* Admin */
 
-.admin-link {
-  margin-bottom: 16px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--accent-border);
-  background: transparent;
-  color: var(--accent);
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.admin-link:hover {
-  background: var(--accent-bg);
-}
-
 .admin-panel {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
 }
 
