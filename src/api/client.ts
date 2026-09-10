@@ -86,6 +86,23 @@ export function createUser(token: string, username: string, email: string, passw
   }).then((r) => handleResponse(r))
 }
 
+export function updateUser(token: string, id: string, username: string, email: string): Promise<UserDto> {
+  return fetch(`${API_BASE_URL}/api/auth/users/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ username, email }),
+  }).then((r) => handleResponse(r))
+}
+
+export function deleteUser(token: string, id: string): Promise<void> {
+  return fetch(`${API_BASE_URL}/api/auth/users/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  }).then((r) => {
+    if (!r.ok) return handleResponse(r)
+  })
+}
+
 export function verifyEmail(token: string): Promise<{ message: string }> {
   return fetch(`${API_BASE_URL}/api/auth/verify-email`, {
     method: 'POST',
