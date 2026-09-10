@@ -7,16 +7,11 @@ interface DocumentSidebarProps {
   uploading: boolean
   processingId: string | null
   deletingId: string | null
-  username: string
-  isAdmin: boolean
   onSelect: (id: string) => void
   onUpload: (file: File) => void
   onProcess: (id: string) => void
   onDelete: (doc: DocumentDto) => void
   onPreview: (doc: DocumentDto) => void
-  onLogout: () => void
-  onOpenAdmin: () => void
-  onOpenProfile: () => void
 }
 
 const statusLabels: Record<DocumentDto['status'], string> = {
@@ -64,16 +59,11 @@ export function DocumentSidebar({
   uploading,
   processingId,
   deletingId,
-  username,
-  isAdmin,
   onSelect,
   onUpload,
   onProcess,
   onDelete,
   onPreview,
-  onLogout,
-  onOpenAdmin,
-  onOpenProfile,
 }: DocumentSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -105,23 +95,6 @@ export function DocumentSidebar({
           onChange={handleFileChange}
         />
       </div>
-
-      <div className="user-bar">
-        <span className="user-name">{username}</span>
-        <button type="button" className="logout-button" onClick={onLogout}>
-          Odjavi se
-        </button>
-      </div>
-
-      <button type="button" className="admin-link" onClick={onOpenProfile}>
-        👤 Profil
-      </button>
-
-      {isAdmin && (
-        <button type="button" className="admin-link" onClick={onOpenAdmin}>
-          ⚙ Admin panel
-        </button>
-      )}
 
       {documents.length === 0 && (
         <p className="sidebar-empty">Još nema otpremljenih dokumenata.</p>
