@@ -121,6 +121,16 @@
   text-decoration: underline;
 }
 
+.login-form button.verify-login-link {
+  margin-top: 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
 .login-form button {
   margin-top: 6px;
   padding: 10px 16px;
