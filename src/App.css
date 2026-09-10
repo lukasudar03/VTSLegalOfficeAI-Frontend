@@ -1041,3 +1041,23 @@
   opacity: 0.75;
   transform: translateY(0);
 }
+
+/* Profile */
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  font-size: 20px;
+}
+
+.profile-success {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #1a7f37;
+}
