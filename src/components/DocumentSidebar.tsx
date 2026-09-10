@@ -16,6 +16,7 @@ interface DocumentSidebarProps {
   onPreview: (doc: DocumentDto) => void
   onLogout: () => void
   onOpenAdmin: () => void
+  onOpenProfile: () => void
 }
 
 const statusLabels: Record<DocumentDto['status'], string> = {
@@ -72,6 +73,7 @@ export function DocumentSidebar({
   onPreview,
   onLogout,
   onOpenAdmin,
+  onOpenProfile,
 }: DocumentSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -110,6 +112,10 @@ export function DocumentSidebar({
           Odjavi se
         </button>
       </div>
+
+      <button type="button" className="admin-link" onClick={onOpenProfile}>
+        👤 Profil
+      </button>
 
       {isAdmin && (
         <button type="button" className="admin-link" onClick={onOpenAdmin}>
