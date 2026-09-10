@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react'
-import { ApiError, askQuestion, deleteDocument, getDocuments, processDocument, uploadDocument } from './api/client'
+import {
+  ApiError,
+  askQuestion,
+  deleteDocument,
+  getDocumentFileBlob,
+  getDocuments,
+  processDocument,
+  uploadDocument,
+} from './api/client'
 import type { ChatMessage } from './api/chat'
 import type { DocumentDto } from './api/types'
 import { DocumentSidebar } from './components/DocumentSidebar'
@@ -7,6 +15,7 @@ import { QaPanel } from './components/QaPanel'
 import { LoginForm } from './components/LoginForm'
 import { AdminPanel } from './components/AdminPanel'
 import { ConfirmDialog } from './components/ConfirmDialog'
+import { DocumentPreviewModal } from './components/DocumentPreviewModal'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -23,6 +32,10 @@ function App() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [view, setView] = useState<'documents' | 'admin'>('documents')
   const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<DocumentDto | null>(null)
+  const [previewDoc, setPreviewDoc] = useState<DocumentDto | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [previewLoading, setPreviewLoading] = useState(false)
+  const [previewError, setPreviewError] = useState<string | null>(null)
 
   useEffect(() => {
     setDocuments([])
@@ -106,6 +119,32 @@ function App() {
     }
   }
 
+  async function handlePreview(doc: DocumentDto) {
+    if (!session) return
+    setPreviewDoc(doc)
+    setPreviewUrl(null)
+    setPreviewError(null)
+    setPreviewLoading(true)
+
+    try {
+      const blob = await getDocumentFileBlob(session.token, doc.id)
+      setPreviewUrl(URL.createObjectURL(blob))
+    } catch (error) {
+      if (!handleAuthError(error)) {
+        setPreviewError(error instanceof Error ? error.message : 'Pregled nije uspeo.')
+      }
+    } finally {
+      setPreviewLoading(false)
+    }
+  }
+
+  function closePreview() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setPreviewDoc(null)
+    setPreviewUrl(null)
+    setPreviewError(null)
+  }
+
   async function handleAsk(question: string) {
     if (!session || !selectedId) return
     const token = session.token
@@ -171,6 +210,7 @@ function App() {
         onUpload={handleUpload}
         onProcess={handleProcess}
         onDelete={setConfirmDeleteDoc}
+        onPreview={handlePreview}
         onLogout={logout}
         onOpenAdmin={() => setView('admin')}
       />
@@ -183,6 +223,16 @@ function App() {
           message={`Obrisati "${confirmDeleteDoc.fileName}"? Ova radnja je nepovratna.`}
           onConfirm={confirmDelete}
           onCancel={() => setConfirmDeleteDoc(null)}
+        />
+      )}
+
+      {previewDoc && (
+        <DocumentPreviewModal
+          fileName={previewDoc.fileName}
+          fileUrl={previewUrl}
+          loading={previewLoading}
+          error={previewError}
+          onClose={closePreview}
         />
       )}
 
