@@ -73,6 +73,14 @@ export function deleteDocument(token: string, id: string): Promise<void> {
   })
 }
 
+export async function getDocumentFileBlob(token: string, id: string): Promise<Blob> {
+  const response = await fetch(`${API_BASE_URL}/api/documents/${id}/file`, {
+    headers: authHeaders(token),
+  })
+  if (!response.ok) return handleResponse(response)
+  return response.blob()
+}
+
 export function askQuestion(token: string, id: string, question: string): Promise<AskAnswerResponseDto> {
   return fetch(`${API_BASE_URL}/api/documents/${id}/ask`, {
     method: 'POST',

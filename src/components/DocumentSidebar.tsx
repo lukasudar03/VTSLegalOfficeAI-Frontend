@@ -13,6 +13,7 @@ interface DocumentSidebarProps {
   onUpload: (file: File) => void
   onProcess: (id: string) => void
   onDelete: (doc: DocumentDto) => void
+  onPreview: (doc: DocumentDto) => void
   onLogout: () => void
   onOpenAdmin: () => void
 }
@@ -43,6 +44,19 @@ function TrashIcon() {
   )
 }
 
+function EyeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path
+        d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  )
+}
+
 export function DocumentSidebar({
   documents,
   selectedId,
@@ -55,6 +69,7 @@ export function DocumentSidebar({
   onUpload,
   onProcess,
   onDelete,
+  onPreview,
   onLogout,
   onOpenAdmin,
 }: DocumentSidebarProps) {
@@ -126,7 +141,16 @@ export function DocumentSidebar({
 
               <button
                 type="button"
-                className="document-delete-button"
+                className="document-icon-button"
+                onClick={() => onPreview(doc)}
+                title="Pregledaj PDF"
+              >
+                <EyeIcon />
+              </button>
+
+              <button
+                type="button"
+                className="document-icon-button danger"
                 disabled={deletingId === doc.id}
                 onClick={() => onDelete(doc)}
                 title="Obriši dokument"
