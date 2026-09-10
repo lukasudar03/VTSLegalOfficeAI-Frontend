@@ -110,6 +110,17 @@
   margin: 0;
 }
 
+.verify-login-link {
+  align-self: flex-start;
+  color: var(--accent);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.verify-login-link:hover {
+  text-decoration: underline;
+}
+
 .login-form button {
   margin-top: 6px;
   padding: 10px 16px;
