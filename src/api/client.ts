@@ -64,6 +64,15 @@ export function processDocument(token: string, id: string): Promise<void> {
   }).then((r) => handleResponse(r))
 }
 
+export function deleteDocument(token: string, id: string): Promise<void> {
+  return fetch(`${API_BASE_URL}/api/documents/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  }).then((r) => {
+    if (!r.ok) return handleResponse(r)
+  })
+}
+
 export function askQuestion(token: string, id: string, question: string): Promise<AskAnswerResponseDto> {
   return fetch(`${API_BASE_URL}/api/documents/${id}/ask`, {
     method: 'POST',
