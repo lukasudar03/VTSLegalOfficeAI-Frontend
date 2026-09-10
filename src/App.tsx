@@ -6,6 +6,7 @@ import { DocumentSidebar } from './components/DocumentSidebar'
 import { QaPanel } from './components/QaPanel'
 import { LoginForm } from './components/LoginForm'
 import { AdminPanel } from './components/AdminPanel'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -21,6 +22,7 @@ function App() {
   const [chatByDocument, setChatByDocument] = useState<Record<string, ChatMessage[]>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
   const [view, setView] = useState<'documents' | 'admin'>('documents')
+  const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<DocumentDto | null>(null)
 
   useEffect(() => {
     setDocuments([])
@@ -85,10 +87,10 @@ function App() {
     }
   }
 
-  async function handleDelete(doc: DocumentDto) {
-    if (!session) return
-    const confirmed = window.confirm(`Obrisati "${doc.fileName}"? Ova radnja je nepovratna.`)
-    if (!confirmed) return
+  async function confirmDelete() {
+    if (!session || !confirmDeleteDoc) return
+    const doc = confirmDeleteDoc
+    setConfirmDeleteDoc(null)
 
     setDeletingId(doc.id)
     try {
@@ -168,12 +170,21 @@ function App() {
         }}
         onUpload={handleUpload}
         onProcess={handleProcess}
-        onDelete={handleDelete}
+        onDelete={setConfirmDeleteDoc}
         onLogout={logout}
         onOpenAdmin={() => setView('admin')}
       />
 
       {loadError && <div className="error-banner">{loadError}</div>}
+
+      {confirmDeleteDoc && (
+        <ConfirmDialog
+          title="Obriši dokument"
+          message={`Obrisati "${confirmDeleteDoc.fileName}"? Ova radnja je nepovratna.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmDeleteDoc(null)}
+        />
+      )}
 
       {view === 'admin' && session.isAdmin ? (
         <AdminPanel
