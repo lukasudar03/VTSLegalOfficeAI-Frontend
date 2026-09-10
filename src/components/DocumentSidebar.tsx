@@ -6,11 +6,13 @@ interface DocumentSidebarProps {
   selectedId: string | null
   uploading: boolean
   processingId: string | null
+  deletingId: string | null
   username: string
   isAdmin: boolean
   onSelect: (id: string) => void
   onUpload: (file: File) => void
   onProcess: (id: string) => void
+  onDelete: (doc: DocumentDto) => void
   onLogout: () => void
   onOpenAdmin: () => void
 }
@@ -31,16 +33,28 @@ function formatDate(iso: string): string {
   })
 }
 
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 6h18" strokeLinecap="round" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" strokeLinecap="round" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function DocumentSidebar({
   documents,
   selectedId,
   uploading,
   processingId,
+  deletingId,
   username,
   isAdmin,
   onSelect,
   onUpload,
   onProcess,
+  onDelete,
   onLogout,
   onOpenAdmin,
 }: DocumentSidebarProps) {
@@ -95,19 +109,31 @@ export function DocumentSidebar({
       <ul className="document-list">
         {documents.map((doc) => (
           <li key={doc.id}>
-            <button
-              type="button"
-              className={`document-item ${doc.id === selectedId ? 'active' : ''}`}
-              onClick={() => onSelect(doc.id)}
-            >
-              <span className="document-name" title={doc.fileName}>
-                {doc.fileName}
-              </span>
-              <span className={`status-badge status-${doc.status.toLowerCase()}`}>
-                {statusLabels[doc.status]}
-              </span>
-              <span className="document-meta">{formatDate(doc.uploadedAt)}</span>
-            </button>
+            <div className="document-row">
+              <button
+                type="button"
+                className={`document-item ${doc.id === selectedId ? 'active' : ''}`}
+                onClick={() => onSelect(doc.id)}
+              >
+                <span className="document-name" title={doc.fileName}>
+                  {doc.fileName}
+                </span>
+                <span className={`status-badge status-${doc.status.toLowerCase()}`}>
+                  {statusLabels[doc.status]}
+                </span>
+                <span className="document-meta">{formatDate(doc.uploadedAt)}</span>
+              </button>
+
+              <button
+                type="button"
+                className="document-delete-button"
+                disabled={deletingId === doc.id}
+                onClick={() => onDelete(doc)}
+                title="Obriši dokument"
+              >
+                <TrashIcon />
+              </button>
+            </div>
 
             {doc.status === 'Uploaded' && (
               <button

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createUser, deleteUser, getUsers, updateUser } from '../api/client'
 import type { UserDto } from '../api/types'
+import { ConfirmDialog } from './ConfirmDialog'
 
 interface AdminPanelProps {
   token: string
@@ -79,6 +80,7 @@ export function AdminPanel({ token, currentUsername, onBack }: AdminPanelProps) 
   const [savingEdit, setSavingEdit] = useState(false)
   const [rowError, setRowError] = useState<Record<string, string>>({})
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDeleteUser, setConfirmDeleteUser] = useState<UserDto | null>(null)
 
   useEffect(() => {
     refreshUsers()
@@ -141,11 +143,10 @@ export function AdminPanel({ token, currentUsername, onBack }: AdminPanelProps) 
     }
   }
 
-  async function handleDelete(user: UserDto) {
-    const confirmed = window.confirm(
-      `Obrisati korisnika "${user.username}"? Ovo briše i sve njegove dokumente. Ova radnja je nepovratna.`,
-    )
-    if (!confirmed) return
+  async function confirmDelete() {
+    if (!confirmDeleteUser) return
+    const user = confirmDeleteUser
+    setConfirmDeleteUser(null)
 
     setDeletingId(user.id)
     try {
@@ -287,7 +288,7 @@ export function AdminPanel({ token, currentUsername, onBack }: AdminPanelProps) 
                           <button
                             type="button"
                             className="icon-button danger"
-                            onClick={() => handleDelete(user)}
+                            onClick={() => setConfirmDeleteUser(user)}
                             disabled={isSelf || deletingId === user.id}
                             title={isSelf ? 'Ne možeš obrisati sopstveni nalog' : 'Obriši'}
                           >
@@ -305,6 +306,15 @@ export function AdminPanel({ token, currentUsername, onBack }: AdminPanelProps) 
           )}
         </section>
       </div>
+
+      {confirmDeleteUser && (
+        <ConfirmDialog
+          title="Obriši korisnika"
+          message={`Obrisati korisnika "${confirmDeleteUser.username}"? Ovo briše i sve njegove dokumente. Ova radnja je nepovratna.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmDeleteUser(null)}
+        />
+      )}
     </main>
   )
 }

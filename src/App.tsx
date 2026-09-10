@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { ApiError, askQuestion, getDocuments, processDocument, uploadDocument } from './api/client'
+import { ApiError, askQuestion, deleteDocument, getDocuments, processDocument, uploadDocument } from './api/client'
 import type { ChatMessage } from './api/chat'
 import type { DocumentDto } from './api/types'
 import { DocumentSidebar } from './components/DocumentSidebar'
 import { QaPanel } from './components/QaPanel'
 import { LoginForm } from './components/LoginForm'
 import { AdminPanel } from './components/AdminPanel'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -16,10 +17,12 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [asking, setAsking] = useState(false)
   const [chatByDocument, setChatByDocument] = useState<Record<string, ChatMessage[]>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
   const [view, setView] = useState<'documents' | 'admin'>('documents')
+  const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<DocumentDto | null>(null)
 
   useEffect(() => {
     setDocuments([])
@@ -84,6 +87,25 @@ function App() {
     }
   }
 
+  async function confirmDelete() {
+    if (!session || !confirmDeleteDoc) return
+    const doc = confirmDeleteDoc
+    setConfirmDeleteDoc(null)
+
+    setDeletingId(doc.id)
+    try {
+      await deleteDocument(session.token, doc.id)
+      if (selectedId === doc.id) setSelectedId(null)
+      await refreshDocuments(session.token)
+    } catch (error) {
+      if (!handleAuthError(error)) {
+        setLoadError(error instanceof Error ? error.message : 'Brisanje dokumenta nije uspelo.')
+      }
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   async function handleAsk(question: string) {
     if (!session || !selectedId) return
     const token = session.token
@@ -139,6 +161,7 @@ function App() {
         selectedId={selectedId}
         uploading={uploading}
         processingId={processingId}
+        deletingId={deletingId}
         username={session.username}
         isAdmin={session.isAdmin}
         onSelect={(id) => {
@@ -147,11 +170,21 @@ function App() {
         }}
         onUpload={handleUpload}
         onProcess={handleProcess}
+        onDelete={setConfirmDeleteDoc}
         onLogout={logout}
         onOpenAdmin={() => setView('admin')}
       />
 
       {loadError && <div className="error-banner">{loadError}</div>}
+
+      {confirmDeleteDoc && (
+        <ConfirmDialog
+          title="Obriši dokument"
+          message={`Obrisati "${confirmDeleteDoc.fileName}"? Ova radnja je nepovratna.`}
+          onConfirm={confirmDelete}
+          onCancel={() => setConfirmDeleteDoc(null)}
+        />
+      )}
 
       {view === 'admin' && session.isAdmin ? (
         <AdminPanel

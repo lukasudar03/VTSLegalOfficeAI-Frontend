@@ -161,8 +161,15 @@
   gap: 8px;
 }
 
+.document-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
 .document-item {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -173,6 +180,31 @@
   background: transparent;
   cursor: pointer;
   color: var(--text-h);
+}
+
+.document-delete-button {
+  flex-shrink: 0;
+  width: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.document-delete-button:hover:not(:disabled) {
+  background: rgba(163, 38, 29, 0.1);
+  color: #a3261d;
+  border-color: rgba(163, 38, 29, 0.4);
+}
+
+.document-delete-button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .document-item:hover {
@@ -688,4 +720,75 @@
   margin: 0;
   font-size: 12px;
   color: #a3261d;
+}
+
+/* Confirm modal */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 6, 13, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+}
+
+.modal-card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.modal-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-cancel {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.modal-cancel:hover {
+  background: var(--code-bg);
+}
+
+.modal-confirm-danger {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #a3261d;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-confirm-danger:hover {
+  opacity: 0.9;
 }
