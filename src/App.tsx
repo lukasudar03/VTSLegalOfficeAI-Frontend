@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ApiError, askQuestion, getDocuments, processDocument, uploadDocument } from './api/client'
+import { ApiError, askQuestion, deleteDocument, getDocuments, processDocument, uploadDocument } from './api/client'
 import type { ChatMessage } from './api/chat'
 import type { DocumentDto } from './api/types'
 import { DocumentSidebar } from './components/DocumentSidebar'
@@ -16,6 +16,7 @@ function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [processingId, setProcessingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [asking, setAsking] = useState(false)
   const [chatByDocument, setChatByDocument] = useState<Record<string, ChatMessage[]>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -84,6 +85,25 @@ function App() {
     }
   }
 
+  async function handleDelete(doc: DocumentDto) {
+    if (!session) return
+    const confirmed = window.confirm(`Obrisati "${doc.fileName}"? Ova radnja je nepovratna.`)
+    if (!confirmed) return
+
+    setDeletingId(doc.id)
+    try {
+      await deleteDocument(session.token, doc.id)
+      if (selectedId === doc.id) setSelectedId(null)
+      await refreshDocuments(session.token)
+    } catch (error) {
+      if (!handleAuthError(error)) {
+        setLoadError(error instanceof Error ? error.message : 'Brisanje dokumenta nije uspelo.')
+      }
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   async function handleAsk(question: string) {
     if (!session || !selectedId) return
     const token = session.token
@@ -139,6 +159,7 @@ function App() {
         selectedId={selectedId}
         uploading={uploading}
         processingId={processingId}
+        deletingId={deletingId}
         username={session.username}
         isAdmin={session.isAdmin}
         onSelect={(id) => {
@@ -147,6 +168,7 @@ function App() {
         }}
         onUpload={handleUpload}
         onProcess={handleProcess}
+        onDelete={handleDelete}
         onLogout={logout}
         onOpenAdmin={() => setView('admin')}
       />
