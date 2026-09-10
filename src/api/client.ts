@@ -127,3 +127,19 @@ export function verifyEmail(token: string): Promise<{ message: string }> {
     body: JSON.stringify({ token }),
   }).then((r) => handleResponse(r))
 }
+
+export function forgotPassword(email: string): Promise<{ message: string }> {
+  return fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  }).then((r) => handleResponse(r))
+}
+
+export function resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+  return fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword }),
+  }).then((r) => handleResponse(r))
+}
