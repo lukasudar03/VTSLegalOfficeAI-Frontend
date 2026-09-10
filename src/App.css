@@ -466,10 +466,21 @@
   border-radius: 8px;
 }
 
+.admin-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
 .admin-user-name {
   font-size: 14px;
   font-weight: 600;
-  flex: 1;
+}
+
+.admin-user-email {
+  font-size: 12px;
+  opacity: 0.6;
 }
 
 .admin-badge {
@@ -478,4 +489,15 @@
   border-radius: 999px;
   background: var(--accent-bg);
   color: var(--accent);
+}
+
+.admin-badge.pending {
+  background: rgba(180, 140, 0, 0.15);
+  color: #b48c00;
+}
+
+.admin-hint {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: -6px 0 10px;
 }

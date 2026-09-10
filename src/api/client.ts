@@ -78,10 +78,18 @@ export function getUsers(token: string): Promise<UserDto[]> {
   }).then((r) => handleResponse(r))
 }
 
-export function createUser(token: string, username: string, password: string): Promise<UserDto> {
+export function createUser(token: string, username: string, email: string, password: string): Promise<UserDto> {
   return fetch(`${API_BASE_URL}/api/auth/users`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, email, password }),
+  }).then((r) => handleResponse(r))
+}
+
+export function verifyEmail(token: string): Promise<{ message: string }> {
+  return fetch(`${API_BASE_URL}/api/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
   }).then((r) => handleResponse(r))
 }
