@@ -4,13 +4,16 @@ import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './auth/AuthContext.tsx'
 import { VerifyEmailPage } from './components/VerifyEmailPage.tsx'
+import { ResetPasswordPage } from './components/ResetPasswordPage.tsx'
 
-const isVerifyEmailRoute = window.location.pathname === '/verify-email'
+const path = window.location.pathname
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {isVerifyEmailRoute ? (
+    {path === '/verify-email' ? (
       <VerifyEmailPage />
+    ) : path === '/reset-password' ? (
+      <ResetPasswordPage />
     ) : (
       <AuthProvider>
         <App />
