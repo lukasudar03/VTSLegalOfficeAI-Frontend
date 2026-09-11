@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { forgotPassword } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
+import { PasswordInput } from './PasswordInput'
 
 export function LoginForm() {
   const { login } = useAuth()
@@ -100,10 +101,9 @@ export function LoginForm() {
 
         <label>
           Lozinka
-          <input
-            type="password"
+          <PasswordInput
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={setPassword}
             autoComplete="current-password"
           />
         </label>
