@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { changePassword } from '../api/client'
+import { PasswordInput } from './PasswordInput'
 
 interface ProfilePageProps {
   token: string
@@ -65,25 +66,22 @@ export function ProfilePage({ token, username, isAdmin, onBack }: ProfilePagePro
         <section className="admin-section admin-create-card">
           <h3>Promeni lozinku</h3>
           <form className="admin-create-form" onSubmit={handleSubmit}>
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Trenutna lozinka"
               value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
+              onChange={setCurrentPassword}
               autoComplete="current-password"
             />
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Nova lozinka"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={setNewPassword}
               autoComplete="new-password"
             />
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Potvrdi novu lozinku"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={setConfirmPassword}
               autoComplete="new-password"
             />
             <button
