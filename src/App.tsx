@@ -3,6 +3,7 @@ import {
   ApiError,
   askQuestion,
   deleteDocument,
+  getChatHistory,
   getDocumentFileBlob,
   getDocuments,
   processDocument,
@@ -50,6 +51,33 @@ function App() {
       refreshDocuments(session.token)
     }
   }, [session?.token])
+
+  useEffect(() => {
+    if (!session || !selectedId) return
+    if (chatByDocument[selectedId] !== undefined) return
+
+    const token = session.token
+    const documentId = selectedId
+
+    getChatHistory(token, documentId)
+      .then((history) => {
+        setChatByDocument((prev) => ({
+          ...prev,
+          [documentId]: history.map((m) => ({
+            id: m.id,
+            question: m.question,
+            answer: m.answer,
+            sources: m.sources,
+            pending: false,
+          })),
+        }))
+      })
+      .catch((error) => {
+        if (!handleAuthError(error)) {
+          setLoadError(error instanceof Error ? error.message : 'Neuspešno učitavanje istorije razgovora.')
+        }
+      })
+  }, [selectedId, session?.token])
 
   function handleAuthError(error: unknown): boolean {
     if (error instanceof ApiError && error.status === 401) {
