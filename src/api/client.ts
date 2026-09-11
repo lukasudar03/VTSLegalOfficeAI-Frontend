@@ -1,4 +1,4 @@
-import type { AskAnswerResponseDto, DocumentDto, LoginResponseDto, UserDto } from './types'
+import type { ChatMessageDto, DocumentDto, LoginResponseDto, UserDto } from './types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5211'
 
@@ -81,11 +81,17 @@ export async function getDocumentFileBlob(token: string, id: string): Promise<Bl
   return response.blob()
 }
 
-export function askQuestion(token: string, id: string, question: string): Promise<AskAnswerResponseDto> {
+export function askQuestion(token: string, id: string, question: string): Promise<ChatMessageDto> {
   return fetch(`${API_BASE_URL}/api/documents/${id}/ask`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
     body: JSON.stringify({ question }),
+  }).then((r) => handleResponse(r))
+}
+
+export function getChatHistory(token: string, id: string): Promise<ChatMessageDto[]> {
+  return fetch(`${API_BASE_URL}/api/documents/${id}/chat`, {
+    headers: authHeaders(token),
   }).then((r) => handleResponse(r))
 }
 

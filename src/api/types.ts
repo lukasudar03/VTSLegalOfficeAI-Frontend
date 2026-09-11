@@ -19,9 +19,12 @@ export interface ChunkSourceDto {
   excerpt: string
 }
 
-export interface AskAnswerResponseDto {
+export interface ChatMessageDto {
+  id: string
+  question: string
   answer: string
   sources: ChunkSourceDto[]
+  createdAt: string
 }
 
 export interface LoginResponseDto {
