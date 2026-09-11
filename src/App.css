@@ -146,6 +146,39 @@
   margin: 0;
 }
 
+.password-field {
+  position: relative;
+  display: flex;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 38px !important;
+}
+
+.password-field button.password-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.password-field button.password-toggle:hover:not(:disabled) {
+  opacity: 0.9;
+  background: none;
+}
+
 .verify-login-link {
   align-self: flex-start;
   color: var(--accent);
