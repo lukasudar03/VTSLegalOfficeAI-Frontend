@@ -7,6 +7,29 @@ interface PasswordInputProps {
   autoComplete?: string
   autoFocus?: boolean
   disabled?: boolean
+  minLength?: number
+  required?: boolean
+  showStrength?: boolean
+}
+
+interface PasswordStrength {
+  percent: number
+  label: string
+  color: string
+}
+
+function getPasswordStrength(password: string): PasswordStrength {
+  let score = 0
+  if (password.length >= 8) score++
+  if (password.length >= 12) score++
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++
+  if (/\d/.test(password)) score++
+  if (/[^A-Za-z0-9]/.test(password)) score++
+
+  if (score <= 1) return { percent: 25, label: 'Slaba', color: '#d1453b' }
+  if (score === 2) return { percent: 50, label: 'Osrednja', color: '#c9720c' }
+  if (score <= 4) return { percent: 75, label: 'Dobra', color: '#c9a00c' }
+  return { percent: 100, label: 'Jaka', color: '#1a7f37' }
 }
 
 function EyeIcon() {
@@ -42,29 +65,51 @@ export function PasswordInput({
   autoComplete,
   autoFocus,
   disabled,
+  minLength,
+  required,
+  showStrength,
 }: PasswordInputProps) {
   const [visible, setVisible] = useState(false)
+  const strength = showStrength && value ? getPasswordStrength(value) : null
 
   return (
-    <div className="password-field">
-      <input
-        type={visible ? 'text' : 'password'}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        autoFocus={autoFocus}
-        disabled={disabled}
-      />
-      <button
-        type="button"
-        className="password-toggle"
-        onClick={() => setVisible((v) => !v)}
-        tabIndex={-1}
-        title={visible ? 'Sakrij lozinku' : 'Prikaži lozinku'}
-      >
-        {visible ? <EyeOffIcon /> : <EyeIcon />}
-      </button>
+    <div className="password-input-wrapper">
+      <div className="password-field">
+        <input
+          type={visible ? 'text' : 'password'}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          autoFocus={autoFocus}
+          disabled={disabled}
+          minLength={minLength}
+          required={required}
+        />
+        <button
+          type="button"
+          className="password-toggle"
+          onClick={() => setVisible((v) => !v)}
+          tabIndex={-1}
+          title={visible ? 'Sakrij lozinku' : 'Prikaži lozinku'}
+        >
+          {visible ? <EyeOffIcon /> : <EyeIcon />}
+        </button>
+      </div>
+
+      {strength && (
+        <div className="password-strength">
+          <div className="password-strength-track">
+            <div
+              className="password-strength-fill"
+              style={{ width: `${strength.percent}%`, background: strength.color }}
+            />
+          </div>
+          <span className="password-strength-label" style={{ color: strength.color }}>
+            {strength.label}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

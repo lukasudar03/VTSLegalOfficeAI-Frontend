@@ -191,10 +191,13 @@ export function AdminPanel({ token, currentUsername, onBack }: AdminPanelProps) 
               autoComplete="off"
             />
             <PasswordInput
-              placeholder="Lozinka"
+              placeholder="Lozinka (najmanje 8 karaktera)"
               value={password}
               onChange={setPassword}
               autoComplete="new-password"
+              minLength={8}
+              required
+              showStrength
             />
             <button type="submit" disabled={creating || !username || !email || !password}>
               {creating ? 'Kreiranje…' : 'Kreiraj korisnika'}
