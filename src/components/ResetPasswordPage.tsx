@@ -50,13 +50,16 @@ export function ResetPasswordPage() {
           <p className="login-subtitle">Postavi novu lozinku za svoj nalog.</p>
 
           <label>
-            Nova lozinka
+            Nova lozinka (najmanje 8 karaktera)
             <PasswordInput
               value={password}
               onChange={setPassword}
               autoFocus
               autoComplete="new-password"
               disabled={!token}
+              minLength={8}
+              required
+              showStrength
             />
           </label>
 
@@ -67,6 +70,8 @@ export function ResetPasswordPage() {
               onChange={setConfirmPassword}
               autoComplete="new-password"
               disabled={!token}
+              minLength={8}
+              required
             />
           </label>
 
