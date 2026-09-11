@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ChatMessage } from '../api/chat'
 import type { DocumentDto } from '../api/types'
 import { EmptyState } from './EmptyState'
@@ -12,6 +12,14 @@ interface QaPanelProps {
 
 export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
   const [question, setQuestion] = useState('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`
+  }, [question])
 
   if (!document) {
     return (
@@ -40,6 +48,13 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
     if (!trimmed || asking) return
     onAsk(trimmed)
     setQuestion('')
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      event.currentTarget.form?.requestSubmit()
+    }
   }
 
   return (
@@ -88,11 +103,13 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
       </div>
 
       <form className="chat-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
+        <textarea
+          ref={textareaRef}
+          rows={1}
           placeholder="Postavi pitanje o dokumentu…"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
+          onKeyDown={handleKeyDown}
           disabled={asking}
         />
         <button type="submit" disabled={asking || !question.trim()}>
