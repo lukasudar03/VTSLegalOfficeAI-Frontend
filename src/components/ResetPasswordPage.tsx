@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ApiError, resetPassword } from '../api/client'
+import { PasswordInput } from './PasswordInput'
 
 type Status = 'form' | 'submitting' | 'success' | 'error'
 
@@ -50,10 +51,9 @@ export function ResetPasswordPage() {
 
           <label>
             Nova lozinka
-            <input
-              type="password"
+            <PasswordInput
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               autoFocus
               autoComplete="new-password"
               disabled={!token}
@@ -62,10 +62,9 @@ export function ResetPasswordPage() {
 
           <label>
             Potvrdi lozinku
-            <input
-              type="password"
+            <PasswordInput
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={setConfirmPassword}
               autoComplete="new-password"
               disabled={!token}
             />
