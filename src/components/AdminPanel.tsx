@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createUser, deleteUser, getUsers, updateUser } from '../api/client'
 import type { UserDto } from '../api/types'
 import { ConfirmDialog } from './ConfirmDialog'
+import { PasswordInput } from './PasswordInput'
 
 interface AdminPanelProps {
   token: string
@@ -189,11 +190,10 @@ export function AdminPanel({ token, currentUsername, onBack }: AdminPanelProps) 
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="off"
             />
-            <input
-              type="password"
+            <PasswordInput
               placeholder="Lozinka"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               autoComplete="new-password"
             />
             <button type="submit" disabled={creating || !username || !email || !password}>
