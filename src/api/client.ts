@@ -143,3 +143,15 @@ export function resetPassword(token: string, newPassword: string): Promise<{ mes
     body: JSON.stringify({ token, newPassword }),
   }).then((r) => handleResponse(r))
 }
+
+export function changePassword(
+  token: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<{ message: string }> {
+  return fetch(`${API_BASE_URL}/api/auth/change-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  }).then((r) => handleResponse(r))
+}

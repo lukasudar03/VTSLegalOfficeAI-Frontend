@@ -11,11 +11,13 @@ import {
 import type { ChatMessage } from './api/chat'
 import type { DocumentDto } from './api/types'
 import { DocumentSidebar } from './components/DocumentSidebar'
+import { TopBar } from './components/TopBar'
 import { QaPanel } from './components/QaPanel'
 import { LoginForm } from './components/LoginForm'
 import { AdminPanel } from './components/AdminPanel'
 import { ConfirmDialog } from './components/ConfirmDialog'
 import { DocumentPreviewModal } from './components/DocumentPreviewModal'
+import { ProfilePage } from './components/ProfilePage'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -30,7 +32,7 @@ function App() {
   const [asking, setAsking] = useState(false)
   const [chatByDocument, setChatByDocument] = useState<Record<string, ChatMessage[]>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [view, setView] = useState<'documents' | 'admin'>('documents')
+  const [view, setView] = useState<'documents' | 'admin' | 'profile'>('documents')
   const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<DocumentDto | null>(null)
   const [previewDoc, setPreviewDoc] = useState<DocumentDto | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -194,62 +196,75 @@ function App() {
   const selectedDocument = documents.find((d) => d.id === selectedId) ?? null
 
   return (
-    <div className="app-layout">
-      <DocumentSidebar
-        documents={documents}
-        selectedId={selectedId}
-        uploading={uploading}
-        processingId={processingId}
-        deletingId={deletingId}
+    <div className="app-shell">
+      <TopBar
         username={session.username}
         isAdmin={session.isAdmin}
-        onSelect={(id) => {
-          setView('documents')
-          setSelectedId(id)
-        }}
-        onUpload={handleUpload}
-        onProcess={handleProcess}
-        onDelete={setConfirmDeleteDoc}
-        onPreview={handlePreview}
-        onLogout={logout}
+        onOpenProfile={() => setView('profile')}
         onOpenAdmin={() => setView('admin')}
+        onLogout={logout}
       />
 
-      {loadError && <div className="error-banner">{loadError}</div>}
+      <div className="app-layout">
+        <DocumentSidebar
+          documents={documents}
+          selectedId={selectedId}
+          uploading={uploading}
+          processingId={processingId}
+          deletingId={deletingId}
+          onSelect={(id) => {
+            setView('documents')
+            setSelectedId(id)
+          }}
+          onUpload={handleUpload}
+          onProcess={handleProcess}
+          onDelete={setConfirmDeleteDoc}
+          onPreview={handlePreview}
+        />
 
-      {confirmDeleteDoc && (
-        <ConfirmDialog
-          title="Obriši dokument"
-          message={`Obrisati "${confirmDeleteDoc.fileName}"? Ova radnja je nepovratna.`}
-          onConfirm={confirmDelete}
-          onCancel={() => setConfirmDeleteDoc(null)}
-        />
-      )}
+        {loadError && <div className="error-banner">{loadError}</div>}
 
-      {previewDoc && (
-        <DocumentPreviewModal
-          fileName={previewDoc.fileName}
-          fileUrl={previewUrl}
-          loading={previewLoading}
-          error={previewError}
-          onClose={closePreview}
-        />
-      )}
+        {confirmDeleteDoc && (
+          <ConfirmDialog
+            title="Obriši dokument"
+            message={`Obrisati "${confirmDeleteDoc.fileName}"? Ova radnja je nepovratna.`}
+            onConfirm={confirmDelete}
+            onCancel={() => setConfirmDeleteDoc(null)}
+          />
+        )}
 
-      {view === 'admin' && session.isAdmin ? (
-        <AdminPanel
-          token={session.token}
-          currentUsername={session.username}
-          onBack={() => setView('documents')}
-        />
-      ) : (
-        <QaPanel
-          document={selectedDocument}
-          messages={selectedId ? (chatByDocument[selectedId] ?? []) : []}
-          asking={asking}
-          onAsk={handleAsk}
-        />
-      )}
+        {previewDoc && (
+          <DocumentPreviewModal
+            fileName={previewDoc.fileName}
+            fileUrl={previewUrl}
+            loading={previewLoading}
+            error={previewError}
+            onClose={closePreview}
+          />
+        )}
+
+        {view === 'admin' && session.isAdmin ? (
+          <AdminPanel
+            token={session.token}
+            currentUsername={session.username}
+            onBack={() => setView('documents')}
+          />
+        ) : view === 'profile' ? (
+          <ProfilePage
+            token={session.token}
+            username={session.username}
+            isAdmin={session.isAdmin}
+            onBack={() => setView('documents')}
+          />
+        ) : (
+          <QaPanel
+            document={selectedDocument}
+            messages={selectedId ? (chatByDocument[selectedId] ?? []) : []}
+            asking={asking}
+            onAsk={handleAsk}
+          />
+        )}
+      </div>
     </div>
   )
 }
