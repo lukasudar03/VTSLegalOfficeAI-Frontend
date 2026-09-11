@@ -73,16 +73,21 @@ export function ProfilePage({ token, username, isAdmin, onBack }: ProfilePagePro
               autoComplete="current-password"
             />
             <PasswordInput
-              placeholder="Nova lozinka"
+              placeholder="Nova lozinka (najmanje 8 karaktera)"
               value={newPassword}
               onChange={setNewPassword}
               autoComplete="new-password"
+              minLength={8}
+              required
+              showStrength
             />
             <PasswordInput
               placeholder="Potvrdi novu lozinku"
               value={confirmPassword}
               onChange={setConfirmPassword}
               autoComplete="new-password"
+              minLength={8}
+              required
             />
             <button
               type="submit"
