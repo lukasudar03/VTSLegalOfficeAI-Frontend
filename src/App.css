@@ -485,6 +485,70 @@
   color: #a3261d;
 }
 
+.chat-answer-markdown p {
+  margin: 0 0 10px;
+}
+
+.chat-answer-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-answer-markdown h1,
+.chat-answer-markdown h2,
+.chat-answer-markdown h3,
+.chat-answer-markdown h4 {
+  margin: 14px 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.chat-answer-markdown h1:first-child,
+.chat-answer-markdown h2:first-child,
+.chat-answer-markdown h3:first-child,
+.chat-answer-markdown h4:first-child {
+  margin-top: 0;
+}
+
+.chat-answer-markdown ul,
+.chat-answer-markdown ol {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+
+.chat-answer-markdown li {
+  margin-bottom: 4px;
+}
+
+.chat-answer-markdown li:last-child {
+  margin-bottom: 0;
+}
+
+.chat-answer-markdown strong {
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.chat-answer-markdown code {
+  background: var(--bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.chat-answer-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+.chat-answer-markdown blockquote {
+  margin: 0 0 10px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  opacity: 0.85;
+}
+
 .chat-sources {
   margin-top: 10px;
   font-size: 12px;
