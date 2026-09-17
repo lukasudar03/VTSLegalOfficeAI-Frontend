@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import type { ChatMessage } from '../api/chat'
 import type { DocumentDto } from '../api/types'
 import { EmptyState } from './EmptyState'
@@ -79,7 +80,9 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
 
             {message.answer && (
               <div className="chat-answer">
-                <p>{message.answer}</p>
+                <div className="chat-answer-markdown">
+                  <ReactMarkdown>{message.answer}</ReactMarkdown>
+                </div>
                 {message.sources && message.sources.length > 0 && (
                   <details className="chat-sources">
                     <summary>Izvori ({message.sources.length})</summary>
