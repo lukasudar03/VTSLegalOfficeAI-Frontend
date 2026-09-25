@@ -264,6 +264,47 @@
   cursor: default;
 }
 
+.sidebar-upload-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.document-type-select {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.all-documents-item {
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.all-documents-item:hover {
+  border-color: var(--accent-border);
+}
+
+.all-documents-item.active {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
 .document-list {
   list-style: none;
   margin: 0;
@@ -347,12 +388,35 @@
   opacity: 0.6;
 }
 
+.document-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .status-badge {
   align-self: flex-start;
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 999px;
   background: var(--code-bg);
+}
+
+.type-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+}
+
+.type-zakon {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.type-pravilnik {
+  opacity: 0.8;
 }
 
 .status-processed {
@@ -483,6 +547,70 @@
 .chat-answer.error {
   background: #ffecec;
   color: #a3261d;
+}
+
+.chat-answer-markdown p {
+  margin: 0 0 10px;
+}
+
+.chat-answer-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-answer-markdown h1,
+.chat-answer-markdown h2,
+.chat-answer-markdown h3,
+.chat-answer-markdown h4 {
+  margin: 14px 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.chat-answer-markdown h1:first-child,
+.chat-answer-markdown h2:first-child,
+.chat-answer-markdown h3:first-child,
+.chat-answer-markdown h4:first-child {
+  margin-top: 0;
+}
+
+.chat-answer-markdown ul,
+.chat-answer-markdown ol {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+
+.chat-answer-markdown li {
+  margin-bottom: 4px;
+}
+
+.chat-answer-markdown li:last-child {
+  margin-bottom: 0;
+}
+
+.chat-answer-markdown strong {
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.chat-answer-markdown code {
+  background: var(--bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.chat-answer-markdown hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 12px 0;
+}
+
+.chat-answer-markdown blockquote {
+  margin: 0 0 10px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+  opacity: 0.85;
 }
 
 .chat-sources {

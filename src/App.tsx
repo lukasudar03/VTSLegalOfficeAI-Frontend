@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import {
   ApiError,
+  askAllQuestion,
   askQuestion,
   deleteDocument,
   getChatHistory,
+  getChatHistoryAll,
   getDocumentFileBlob,
   getDocuments,
   processDocument,
   uploadDocument,
 } from './api/client'
 import type { ChatMessage } from './api/chat'
-import type { DocumentDto } from './api/types'
-import { DocumentSidebar } from './components/DocumentSidebar'
+import type { DocumentDto, DocumentType } from './api/types'
+import { ALL_DOCUMENTS_ID, DocumentSidebar } from './components/DocumentSidebar'
 import { TopBar } from './components/TopBar'
 import { QaPanel } from './components/QaPanel'
 import { LoginForm } from './components/LoginForm'
@@ -58,8 +60,10 @@ function App() {
 
     const token = session.token
     const documentId = selectedId
+    const historyPromise =
+      documentId === ALL_DOCUMENTS_ID ? getChatHistoryAll(token) : getChatHistory(token, documentId)
 
-    getChatHistory(token, documentId)
+    historyPromise
       .then((history) => {
         setChatByDocument((prev) => ({
           ...prev,
@@ -99,11 +103,11 @@ function App() {
     }
   }
 
-  async function handleUpload(file: File) {
+  async function handleUpload(file: File, documentType: DocumentType) {
     if (!session) return
     setUploading(true)
     try {
-      const uploaded = await uploadDocument(session.token, file)
+      const uploaded = await uploadDocument(session.token, file, documentType)
       await refreshDocuments(session.token)
       setSelectedId(uploaded.id)
     } catch (error) {
@@ -188,7 +192,10 @@ function App() {
     setAsking(true)
 
     try {
-      const result = await askQuestion(token, documentId, question)
+      const result =
+        documentId === ALL_DOCUMENTS_ID
+          ? await askAllQuestion(token, question)
+          : await askQuestion(token, documentId, question)
       setChatByDocument((prev) => ({
         ...prev,
         [documentId]: (prev[documentId] ?? []).map((m) =>
@@ -287,6 +294,7 @@ function App() {
         ) : (
           <QaPanel
             document={selectedDocument}
+            multiMode={selectedId === ALL_DOCUMENTS_ID}
             messages={selectedId ? (chatByDocument[selectedId] ?? []) : []}
             asking={asking}
             onAsk={handleAsk}

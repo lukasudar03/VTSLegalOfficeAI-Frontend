@@ -1,4 +1,4 @@
-import type { ChatMessageDto, DocumentDto, LoginResponseDto, UserDto } from './types'
+import type { ChatMessageDto, DocumentDto, DocumentType, LoginResponseDto, UserDto } from './types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5211'
 
@@ -46,9 +46,10 @@ export function getDocuments(token: string): Promise<DocumentDto[]> {
   }).then((r) => handleResponse(r))
 }
 
-export function uploadDocument(token: string, file: File): Promise<DocumentDto> {
+export function uploadDocument(token: string, file: File, documentType: DocumentType): Promise<DocumentDto> {
   const formData = new FormData()
   formData.append('File', file)
+  formData.append('DocumentType', documentType)
 
   return fetch(`${API_BASE_URL}/api/documents/upload`, {
     method: 'POST',
@@ -91,6 +92,20 @@ export function askQuestion(token: string, id: string, question: string): Promis
 
 export function getChatHistory(token: string, id: string): Promise<ChatMessageDto[]> {
   return fetch(`${API_BASE_URL}/api/documents/${id}/chat`, {
+    headers: authHeaders(token),
+  }).then((r) => handleResponse(r))
+}
+
+export function askAllQuestion(token: string, question: string, documentIds?: string[]): Promise<ChatMessageDto> {
+  return fetch(`${API_BASE_URL}/api/documents/ask-all`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ question, documentIds }),
+  }).then((r) => handleResponse(r))
+}
+
+export function getChatHistoryAll(token: string): Promise<ChatMessageDto[]> {
+  return fetch(`${API_BASE_URL}/api/documents/chat-all`, {
     headers: authHeaders(token),
   }).then((r) => handleResponse(r))
 }

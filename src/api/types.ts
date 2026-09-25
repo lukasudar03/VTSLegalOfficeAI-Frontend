@@ -1,4 +1,5 @@
 export type DocumentStatus = 'Uploaded' | 'Processing' | 'Processed'
+export type DocumentType = 'Zakon' | 'Pravilnik'
 
 export interface DocumentDto {
   id: string
@@ -7,6 +8,7 @@ export interface DocumentDto {
   fileSizeBytes: number
   totalPages: number | null
   status: DocumentStatus
+  documentType: DocumentType
   extractedText: string | null
   uploadedAt: string
 }
@@ -17,6 +19,9 @@ export interface ChunkSourceDto {
   pageFrom: number
   pageTo: number
   excerpt: string
+  documentId: string
+  fileName: string
+  documentType: DocumentType
 }
 
 export interface ChatMessageDto {
