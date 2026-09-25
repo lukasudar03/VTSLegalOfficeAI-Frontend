@@ -6,12 +6,13 @@ import { EmptyState } from './EmptyState'
 
 interface QaPanelProps {
   document: DocumentDto | null
+  multiMode?: boolean
   messages: ChatMessage[]
   asking: boolean
   onAsk: (question: string) => void
 }
 
-export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
+export function QaPanel({ document, multiMode = false, messages, asking, onAsk }: QaPanelProps) {
   const [question, setQuestion] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -22,7 +23,7 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`
   }, [question])
 
-  if (!document) {
+  if (!multiMode && !document) {
     return (
       <main className="qa-panel">
         <EmptyState />
@@ -30,7 +31,7 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
     )
   }
 
-  if (document.status !== 'Processed') {
+  if (!multiMode && document && document.status !== 'Processed') {
     return (
       <main className="qa-panel qa-panel-empty">
         <h2>{document.fileName}</h2>
@@ -61,13 +62,17 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
   return (
     <main className="qa-panel">
       <header className="qa-panel-header">
-        <h2>{document.fileName}</h2>
-        <span className="qa-panel-meta">{document.totalPages} strana</span>
+        <h2>{multiMode ? 'Svi dokumenti' : document?.fileName}</h2>
+        {!multiMode && document && <span className="qa-panel-meta">{document.totalPages} strana</span>}
       </header>
 
       <div className="chat-log">
         {messages.length === 0 && (
-          <p className="chat-empty">Postavi pitanje o sadržaju ovog dokumenta.</p>
+          <p className="chat-empty">
+            {multiMode
+              ? 'Postavi pitanje koje pretražuje sve tvoje obrađene dokumente.'
+              : 'Postavi pitanje o sadržaju ovog dokumenta.'}
+          </p>
         )}
 
         {messages.map((message) => (
@@ -90,7 +95,10 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
                       {message.sources.map((source) => (
                         <li key={source.chunkId}>
                           <strong>
-                            Strane {source.pageFrom}
+                            {multiMode && source.fileName
+                              ? `${source.documentType}: ${source.fileName}, strane `
+                              : 'Strane '}
+                            {source.pageFrom}
                             {source.pageTo !== source.pageFrom ? `–${source.pageTo}` : ''}:
                           </strong>{' '}
                           {source.excerpt}
@@ -109,7 +117,7 @@ export function QaPanel({ document, messages, asking, onAsk }: QaPanelProps) {
         <textarea
           ref={textareaRef}
           rows={1}
-          placeholder="Postavi pitanje o dokumentu…"
+          placeholder={multiMode ? 'Postavi pitanje o svim dokumentima…' : 'Postavi pitanje o dokumentu…'}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={handleKeyDown}
