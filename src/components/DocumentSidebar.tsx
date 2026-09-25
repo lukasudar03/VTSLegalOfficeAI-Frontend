@@ -1,5 +1,7 @@
-import { useRef } from 'react'
-import type { DocumentDto } from '../api/types'
+import { useRef, useState } from 'react'
+import type { DocumentDto, DocumentType } from '../api/types'
+
+export const ALL_DOCUMENTS_ID = '__all__'
 
 interface DocumentSidebarProps {
   documents: DocumentDto[]
@@ -8,7 +10,7 @@ interface DocumentSidebarProps {
   processingId: string | null
   deletingId: string | null
   onSelect: (id: string) => void
-  onUpload: (file: File) => void
+  onUpload: (file: File, documentType: DocumentType) => void
   onProcess: (id: string) => void
   onDelete: (doc: DocumentDto) => void
   onPreview: (doc: DocumentDto) => void
@@ -18,6 +20,11 @@ const statusLabels: Record<DocumentDto['status'], string> = {
   Uploaded: 'Otpremljen',
   Processing: 'Obrađuje se…',
   Processed: 'Spreman',
+}
+
+const typeLabels: Record<DocumentType, string> = {
+  Zakon: 'Zakon',
+  Pravilnik: 'Pravilnik',
 }
 
 function formatDate(iso: string): string {
@@ -66,11 +73,12 @@ export function DocumentSidebar({
   onPreview,
 }: DocumentSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [pendingType, setPendingType] = useState<DocumentType>('Pravilnik')
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (file) {
-      onUpload(file)
+      onUpload(file, pendingType)
     }
     event.target.value = ''
   }
@@ -79,6 +87,18 @@ export function DocumentSidebar({
     <aside className="sidebar">
       <div className="sidebar-header">
         <h2>Dokumenti</h2>
+      </div>
+
+      <div className="sidebar-upload-row">
+        <select
+          className="document-type-select"
+          value={pendingType}
+          onChange={(e) => setPendingType(e.target.value as DocumentType)}
+          title="Tip akta za sledeći otpremljeni dokument"
+        >
+          <option value="Pravilnik">Pravilnik</option>
+          <option value="Zakon">Zakon</option>
+        </select>
         <button
           type="button"
           className="upload-button"
@@ -96,6 +116,16 @@ export function DocumentSidebar({
         />
       </div>
 
+      {documents.length > 0 && (
+        <button
+          type="button"
+          className={`all-documents-item ${selectedId === ALL_DOCUMENTS_ID ? 'active' : ''}`}
+          onClick={() => onSelect(ALL_DOCUMENTS_ID)}
+        >
+          Svi dokumenti
+        </button>
+      )}
+
       {documents.length === 0 && (
         <p className="sidebar-empty">Još nema otpremljenih dokumenata.</p>
       )}
@@ -112,8 +142,13 @@ export function DocumentSidebar({
                 <span className="document-name" title={doc.fileName}>
                   {doc.fileName}
                 </span>
-                <span className={`status-badge status-${doc.status.toLowerCase()}`}>
-                  {statusLabels[doc.status]}
+                <span className="document-badges">
+                  <span className={`status-badge status-${doc.status.toLowerCase()}`}>
+                    {statusLabels[doc.status]}
+                  </span>
+                  <span className={`type-badge type-${doc.documentType.toLowerCase()}`}>
+                    {typeLabels[doc.documentType]}
+                  </span>
                 </span>
                 <span className="document-meta">{formatDate(doc.uploadedAt)}</span>
               </button>
