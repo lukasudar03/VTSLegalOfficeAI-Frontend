@@ -1,5 +1,6 @@
 export type DocumentStatus = 'Uploaded' | 'Processing' | 'Processed'
 export type DocumentType = 'Zakon' | 'Pravilnik'
+export type ConfidenceLevel = 'NISKA' | 'SREDNJA' | 'VISOKA'
 
 export interface DocumentDto {
   id: string
@@ -29,6 +30,8 @@ export interface ChatMessageDto {
   question: string
   answer: string
   sources: ChunkSourceDto[]
+  confidence: ConfidenceLevel
+  confidenceNote: string
   createdAt: string
 }
 

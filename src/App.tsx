@@ -72,6 +72,8 @@ function App() {
             question: m.question,
             answer: m.answer,
             sources: m.sources,
+            confidence: m.confidence,
+            confidenceNote: m.confidenceNote,
             pending: false,
           })),
         }))
@@ -200,7 +202,14 @@ function App() {
         ...prev,
         [documentId]: (prev[documentId] ?? []).map((m) =>
           m.id === messageId
-            ? { ...m, pending: false, answer: result.answer, sources: result.sources }
+            ? {
+                ...m,
+                pending: false,
+                answer: result.answer,
+                sources: result.sources,
+                confidence: result.confidence,
+                confidenceNote: result.confidenceNote,
+              }
             : m,
         ),
       }))

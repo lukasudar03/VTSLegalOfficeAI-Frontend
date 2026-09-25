@@ -4,6 +4,12 @@ import type { ChatMessage } from '../api/chat'
 import type { DocumentDto } from '../api/types'
 import { EmptyState } from './EmptyState'
 
+const confidenceLabels: Record<string, string> = {
+  NISKA: 'Niska pouzdanost',
+  SREDNJA: 'Srednja pouzdanost',
+  VISOKA: 'Visoka pouzdanost',
+}
+
 interface QaPanelProps {
   document: DocumentDto | null
   multiMode?: boolean
@@ -85,6 +91,17 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
 
             {message.answer && (
               <div className="chat-answer">
+                {message.confidence && (
+                  <span className={`confidence-badge confidence-${message.confidence.toLowerCase()}`}>
+                    {confidenceLabels[message.confidence] ?? message.confidence}
+                  </span>
+                )}
+                {message.confidence === 'NISKA' && (
+                  <div className="confidence-warning">
+                    ⚠️ Nisam siguran u ovaj odgovor — proveri kod nadležnog lica.
+                    {message.confidenceNote ? ` ${message.confidenceNote}` : ''}
+                  </div>
+                )}
                 <div className="chat-answer-markdown">
                   <ReactMarkdown>{message.answer}</ReactMarkdown>
                 </div>
