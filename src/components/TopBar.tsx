@@ -3,10 +3,11 @@ interface TopBarProps {
   isAdmin: boolean
   onOpenProfile: () => void
   onOpenAdmin: () => void
+  onOpenCompare: () => void
   onLogout: () => void
 }
 
-export function TopBar({ username, isAdmin, onOpenProfile, onOpenAdmin, onLogout }: TopBarProps) {
+export function TopBar({ username, isAdmin, onOpenProfile, onOpenAdmin, onOpenCompare, onLogout }: TopBarProps) {
   return (
     <header className="top-bar">
       <div className="top-bar-brand">VTS Legal Office AI</div>
@@ -19,6 +20,10 @@ export function TopBar({ username, isAdmin, onOpenProfile, onOpenAdmin, onLogout
             ⚙ Admin panel
           </button>
         )}
+
+        <button type="button" className="top-bar-link" onClick={onOpenCompare}>
+          ⚖ Uporedi verzije
+        </button>
 
         <button type="button" className="top-bar-link" onClick={onOpenProfile}>
           👤 Profil

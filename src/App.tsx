@@ -21,6 +21,7 @@ import { AdminPanel } from './components/AdminPanel'
 import { ConfirmDialog } from './components/ConfirmDialog'
 import { DocumentPreviewModal } from './components/DocumentPreviewModal'
 import { ProfilePage } from './components/ProfilePage'
+import { CompareView } from './components/CompareView'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -35,7 +36,7 @@ function App() {
   const [asking, setAsking] = useState(false)
   const [chatByDocument, setChatByDocument] = useState<Record<string, ChatMessage[]>>({})
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [view, setView] = useState<'documents' | 'admin' | 'profile'>('documents')
+  const [view, setView] = useState<'documents' | 'admin' | 'profile' | 'compare'>('documents')
   const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<DocumentDto | null>(null)
   const [previewDoc, setPreviewDoc] = useState<DocumentDto | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -250,6 +251,7 @@ function App() {
         isAdmin={session.isAdmin}
         onOpenProfile={() => setView('profile')}
         onOpenAdmin={() => setView('admin')}
+        onOpenCompare={() => setView('compare')}
         onLogout={logout}
       />
 
@@ -304,6 +306,8 @@ function App() {
             isAdmin={session.isAdmin}
             onBack={() => setView('documents')}
           />
+        ) : view === 'compare' ? (
+          <CompareView token={session.token} documents={documents} onBack={() => setView('documents')} />
         ) : (
           <QaPanel
             document={selectedDocument}

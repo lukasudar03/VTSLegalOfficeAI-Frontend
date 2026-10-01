@@ -1,4 +1,11 @@
-import type { ChatMessageDto, DocumentDto, DocumentType, LoginResponseDto, UserDto } from './types'
+import type {
+  ChatMessageDto,
+  DocumentComparisonResultDto,
+  DocumentDto,
+  DocumentType,
+  LoginResponseDto,
+  UserDto,
+} from './types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5211'
 
@@ -174,5 +181,17 @@ export function changePassword(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
     body: JSON.stringify({ currentPassword, newPassword }),
+  }).then((r) => handleResponse(r))
+}
+
+export function compareDocuments(
+  token: string,
+  documentId1: string,
+  documentId2: string,
+): Promise<DocumentComparisonResultDto> {
+  return fetch(`${API_BASE_URL}/api/documents/compare`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ documentId1, documentId2 }),
   }).then((r) => handleResponse(r))
 }

@@ -53,3 +53,19 @@ export interface UserDto {
   emailVerified: boolean
   createdAt: string
 }
+
+export interface ArticleDiffDto {
+  articleNumber: number
+  oldText: string | null
+  newText: string | null
+  summary: string | null
+}
+
+export interface DocumentComparisonResultDto {
+  document1Name: string
+  document2Name: string
+  unchangedCount: number
+  added: ArticleDiffDto[]
+  removed: ArticleDiffDto[]
+  changed: ArticleDiffDto[]
+}
