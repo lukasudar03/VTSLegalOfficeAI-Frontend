@@ -10,6 +10,12 @@ const confidenceLabels: Record<string, string> = {
   VISOKA: 'Visoka pouzdanost',
 }
 
+const deadlineUnitLabels: Record<string, string> = {
+  dana: 'dana',
+  meseci: 'meseci',
+  godina: 'godina',
+}
+
 interface QaPanelProps {
   document: DocumentDto | null
   multiMode?: boolean
@@ -18,8 +24,23 @@ interface QaPanelProps {
   onAsk: (question: string) => void
 }
 
+function addToDate(startDate: string, amount: number, unit: string): string | null {
+  const start = new Date(`${startDate}T00:00:00`)
+  if (Number.isNaN(start.getTime())) return null
+
+  const result = new Date(start)
+  if (unit === 'dana') result.setDate(result.getDate() + amount)
+  else if (unit === 'meseci') result.setMonth(result.getMonth() + amount)
+  else if (unit === 'godina') result.setFullYear(result.getFullYear() + amount)
+  else return null
+
+  return result.toISOString().slice(0, 10)
+}
+
 export function QaPanel({ document, multiMode = false, messages, asking, onAsk }: QaPanelProps) {
   const [question, setQuestion] = useState('')
+  const [deadlineInputs, setDeadlineInputs] = useState<Record<string, string>>({})
+  const [computedDueDates, setComputedDueDates] = useState<Record<string, string>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -65,6 +86,14 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
     }
   }
 
+  function handleComputeDueDate(messageId: string, amount: number, unit: string) {
+    const startDate = deadlineInputs[messageId]
+    if (!startDate) return
+    const dueDate = addToDate(startDate, amount, unit)
+    if (!dueDate) return
+    setComputedDueDates((prev) => ({ ...prev, [messageId]: dueDate }))
+  }
+
   return (
     <main className="qa-panel">
       <header className="qa-panel-header">
@@ -100,6 +129,41 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
                   <div className="confidence-warning">
                     ⚠️ Nisam siguran u ovaj odgovor — proveri kod nadležnog lica.
                     {message.confidenceNote ? ` ${message.confidenceNote}` : ''}
+                  </div>
+                )}
+                {message.deadlineAmount != null && message.deadlineUnit && (
+                  <div className="deadline-info">
+                    <div>
+                      ⏱ Rok: {message.deadlineAmount}{' '}
+                      {deadlineUnitLabels[message.deadlineUnit] ?? message.deadlineUnit}
+                      <span className="deadline-disclaimer"> (proveri kod nadležnog lica)</span>
+                    </div>
+                    {computedDueDates[message.id] ? (
+                      <div>
+                        Ističe: <strong>{computedDueDates[message.id]}</strong>
+                      </div>
+                    ) : (
+                      <div className="deadline-calc-row">
+                        <input
+                          type="date"
+                          className="deadline-date-input"
+                          value={deadlineInputs[message.id] ?? ''}
+                          onChange={(e) =>
+                            setDeadlineInputs((prev) => ({ ...prev, [message.id]: e.target.value }))
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="deadline-calc-button"
+                          disabled={!deadlineInputs[message.id]}
+                          onClick={() =>
+                            handleComputeDueDate(message.id, message.deadlineAmount!, message.deadlineUnit!)
+                          }
+                        >
+                          Izračunaj krajnji datum
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="chat-answer-markdown">

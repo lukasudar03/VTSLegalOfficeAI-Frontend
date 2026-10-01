@@ -74,6 +74,8 @@ function App() {
             sources: m.sources,
             confidence: m.confidence,
             confidenceNote: m.confidenceNote,
+            deadlineAmount: m.deadlineAmount,
+            deadlineUnit: m.deadlineUnit,
             pending: false,
           })),
         }))
@@ -209,6 +211,8 @@ function App() {
                 sources: result.sources,
                 confidence: result.confidence,
                 confidenceNote: result.confidenceNote,
+                deadlineAmount: result.deadlineAmount,
+                deadlineUnit: result.deadlineUnit,
               }
             : m,
         ),
