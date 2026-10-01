@@ -15,11 +15,19 @@ interface QaPanelProps {
   multiMode?: boolean
   messages: ChatMessage[]
   asking: boolean
-  onAsk: (question: string) => void
+  onAsk: (question: string, deadlineStartDate?: string) => void
+}
+
+const deadlineUnitLabels: Record<string, string> = {
+  dana: 'dana',
+  meseci: 'meseci',
+  godina: 'godina',
 }
 
 export function QaPanel({ document, multiMode = false, messages, asking, onAsk }: QaPanelProps) {
   const [question, setQuestion] = useState('')
+  const [showDeadlineInput, setShowDeadlineInput] = useState(false)
+  const [deadlineStartDate, setDeadlineStartDate] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -54,7 +62,7 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
     event.preventDefault()
     const trimmed = question.trim()
     if (!trimmed || asking) return
-    onAsk(trimmed)
+    onAsk(trimmed, showDeadlineInput && deadlineStartDate ? deadlineStartDate : undefined)
     setQuestion('')
   }
 
@@ -102,6 +110,13 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
                     {message.confidenceNote ? ` ${message.confidenceNote}` : ''}
                   </div>
                 )}
+                {message.deadlineAmount != null && message.deadlineUnit && (
+                  <div className="deadline-info">
+                    ⏱ Rok: {message.deadlineAmount} {deadlineUnitLabels[message.deadlineUnit] ?? message.deadlineUnit}
+                    {message.deadlineDueDate && <> — ističe <strong>{message.deadlineDueDate}</strong></>}
+                    <span className="deadline-disclaimer"> (nacrt proračuna, proveri kod nadležnog lica)</span>
+                  </div>
+                )}
                 <div className="chat-answer-markdown">
                   <ReactMarkdown>{message.answer}</ReactMarkdown>
                 </div>
@@ -128,6 +143,25 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
             )}
           </div>
         ))}
+      </div>
+
+      <div className="deadline-toggle-row">
+        <label className="deadline-toggle-label">
+          <input
+            type="checkbox"
+            checked={showDeadlineInput}
+            onChange={(e) => setShowDeadlineInput(e.target.checked)}
+          />
+          Izračunaj krajnji datum roka
+        </label>
+        {showDeadlineInput && (
+          <input
+            type="date"
+            className="deadline-date-input"
+            value={deadlineStartDate}
+            onChange={(e) => setDeadlineStartDate(e.target.value)}
+          />
+        )}
       </div>
 
       <form className="chat-form" onSubmit={handleSubmit}>
