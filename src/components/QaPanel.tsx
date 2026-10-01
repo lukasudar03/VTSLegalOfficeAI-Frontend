@@ -110,7 +110,10 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
                     <summary>Izvori ({message.sources.length})</summary>
                     <ul>
                       {message.sources.map((source) => (
-                        <li key={source.chunkId}>
+                        <li key={source.chunkId} className={source.isRelatedProvision ? 'source-related' : undefined}>
+                          {source.isRelatedProvision && (
+                            <span className="related-provision-tag">Povezana odredba</span>
+                          )}
                           <strong>
                             {multiMode && source.fileName
                               ? `${source.documentType}: ${source.fileName}, strane `
