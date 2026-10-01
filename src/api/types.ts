@@ -23,6 +23,7 @@ export interface ChunkSourceDto {
   documentId: string
   fileName: string
   documentType: DocumentType
+  isRelatedProvision: boolean
 }
 
 export interface ChatMessageDto {
