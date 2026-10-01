@@ -34,7 +34,6 @@ export interface ChatMessageDto {
   confidenceNote: string
   deadlineAmount: number | null
   deadlineUnit: string | null
-  deadlineDueDate: string | null
   createdAt: string
 }
 

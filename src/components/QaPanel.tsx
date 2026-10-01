@@ -10,24 +10,37 @@ const confidenceLabels: Record<string, string> = {
   VISOKA: 'Visoka pouzdanost',
 }
 
-interface QaPanelProps {
-  document: DocumentDto | null
-  multiMode?: boolean
-  messages: ChatMessage[]
-  asking: boolean
-  onAsk: (question: string, deadlineStartDate?: string) => void
-}
-
 const deadlineUnitLabels: Record<string, string> = {
   dana: 'dana',
   meseci: 'meseci',
   godina: 'godina',
 }
 
+interface QaPanelProps {
+  document: DocumentDto | null
+  multiMode?: boolean
+  messages: ChatMessage[]
+  asking: boolean
+  onAsk: (question: string) => void
+}
+
+function addToDate(startDate: string, amount: number, unit: string): string | null {
+  const start = new Date(`${startDate}T00:00:00`)
+  if (Number.isNaN(start.getTime())) return null
+
+  const result = new Date(start)
+  if (unit === 'dana') result.setDate(result.getDate() + amount)
+  else if (unit === 'meseci') result.setMonth(result.getMonth() + amount)
+  else if (unit === 'godina') result.setFullYear(result.getFullYear() + amount)
+  else return null
+
+  return result.toISOString().slice(0, 10)
+}
+
 export function QaPanel({ document, multiMode = false, messages, asking, onAsk }: QaPanelProps) {
   const [question, setQuestion] = useState('')
-  const [showDeadlineInput, setShowDeadlineInput] = useState(false)
-  const [deadlineStartDate, setDeadlineStartDate] = useState('')
+  const [deadlineInputs, setDeadlineInputs] = useState<Record<string, string>>({})
+  const [computedDueDates, setComputedDueDates] = useState<Record<string, string>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -62,7 +75,7 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
     event.preventDefault()
     const trimmed = question.trim()
     if (!trimmed || asking) return
-    onAsk(trimmed, showDeadlineInput && deadlineStartDate ? deadlineStartDate : undefined)
+    onAsk(trimmed)
     setQuestion('')
   }
 
@@ -71,6 +84,14 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
       event.preventDefault()
       event.currentTarget.form?.requestSubmit()
     }
+  }
+
+  function handleComputeDueDate(messageId: string, amount: number, unit: string) {
+    const startDate = deadlineInputs[messageId]
+    if (!startDate) return
+    const dueDate = addToDate(startDate, amount, unit)
+    if (!dueDate) return
+    setComputedDueDates((prev) => ({ ...prev, [messageId]: dueDate }))
   }
 
   return (
@@ -112,9 +133,37 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
                 )}
                 {message.deadlineAmount != null && message.deadlineUnit && (
                   <div className="deadline-info">
-                    ⏱ Rok: {message.deadlineAmount} {deadlineUnitLabels[message.deadlineUnit] ?? message.deadlineUnit}
-                    {message.deadlineDueDate && <> — ističe <strong>{message.deadlineDueDate}</strong></>}
-                    <span className="deadline-disclaimer"> (nacrt proračuna, proveri kod nadležnog lica)</span>
+                    <div>
+                      ⏱ Rok: {message.deadlineAmount}{' '}
+                      {deadlineUnitLabels[message.deadlineUnit] ?? message.deadlineUnit}
+                      <span className="deadline-disclaimer"> (proveri kod nadležnog lica)</span>
+                    </div>
+                    {computedDueDates[message.id] ? (
+                      <div>
+                        Ističe: <strong>{computedDueDates[message.id]}</strong>
+                      </div>
+                    ) : (
+                      <div className="deadline-calc-row">
+                        <input
+                          type="date"
+                          className="deadline-date-input"
+                          value={deadlineInputs[message.id] ?? ''}
+                          onChange={(e) =>
+                            setDeadlineInputs((prev) => ({ ...prev, [message.id]: e.target.value }))
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="deadline-calc-button"
+                          disabled={!deadlineInputs[message.id]}
+                          onClick={() =>
+                            handleComputeDueDate(message.id, message.deadlineAmount!, message.deadlineUnit!)
+                          }
+                        >
+                          Izračunaj krajnji datum
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="chat-answer-markdown">
@@ -143,25 +192,6 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
             )}
           </div>
         ))}
-      </div>
-
-      <div className="deadline-toggle-row">
-        <label className="deadline-toggle-label">
-          <input
-            type="checkbox"
-            checked={showDeadlineInput}
-            onChange={(e) => setShowDeadlineInput(e.target.checked)}
-          />
-          Izračunaj krajnji datum roka
-        </label>
-        {showDeadlineInput && (
-          <input
-            type="date"
-            className="deadline-date-input"
-            value={deadlineStartDate}
-            onChange={(e) => setDeadlineStartDate(e.target.value)}
-          />
-        )}
       </div>
 
       <form className="chat-form" onSubmit={handleSubmit}>

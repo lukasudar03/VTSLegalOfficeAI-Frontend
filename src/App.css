@@ -598,29 +598,35 @@
   font-size: 12px;
 }
 
-.deadline-toggle-row {
+.deadline-calc-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 28px 0;
-  font-size: 13px;
-}
-
-.deadline-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  opacity: 0.85;
+  gap: 8px;
+  margin-top: 6px;
 }
 
 .deadline-date-input {
-  background: var(--code-bg);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 4px 8px;
   color: var(--text);
   font-size: 13px;
+}
+
+.deadline-calc-button {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.deadline-calc-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .chat-answer-markdown p {

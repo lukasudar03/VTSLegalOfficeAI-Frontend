@@ -76,7 +76,6 @@ function App() {
             confidenceNote: m.confidenceNote,
             deadlineAmount: m.deadlineAmount,
             deadlineUnit: m.deadlineUnit,
-            deadlineDueDate: m.deadlineDueDate,
             pending: false,
           })),
         }))
@@ -184,7 +183,7 @@ function App() {
     setPreviewError(null)
   }
 
-  async function handleAsk(question: string, deadlineStartDate?: string) {
+  async function handleAsk(question: string) {
     if (!session || !selectedId) return
     const token = session.token
     const documentId = selectedId
@@ -199,8 +198,8 @@ function App() {
     try {
       const result =
         documentId === ALL_DOCUMENTS_ID
-          ? await askAllQuestion(token, question, undefined, deadlineStartDate)
-          : await askQuestion(token, documentId, question, deadlineStartDate)
+          ? await askAllQuestion(token, question)
+          : await askQuestion(token, documentId, question)
       setChatByDocument((prev) => ({
         ...prev,
         [documentId]: (prev[documentId] ?? []).map((m) =>
@@ -214,7 +213,6 @@ function App() {
                 confidenceNote: result.confidenceNote,
                 deadlineAmount: result.deadlineAmount,
                 deadlineUnit: result.deadlineUnit,
-                deadlineDueDate: result.deadlineDueDate,
               }
             : m,
         ),
