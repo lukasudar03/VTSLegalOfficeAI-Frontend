@@ -82,11 +82,16 @@ export async function getDocumentFileBlob(token: string, id: string): Promise<Bl
   return response.blob()
 }
 
-export function askQuestion(token: string, id: string, question: string): Promise<ChatMessageDto> {
+export function askQuestion(
+  token: string,
+  id: string,
+  question: string,
+  isDraftRequest?: boolean,
+): Promise<ChatMessageDto> {
   return fetch(`${API_BASE_URL}/api/documents/${id}/ask`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, isDraftRequest }),
   }).then((r) => handleResponse(r))
 }
 
@@ -96,11 +101,16 @@ export function getChatHistory(token: string, id: string): Promise<ChatMessageDt
   }).then((r) => handleResponse(r))
 }
 
-export function askAllQuestion(token: string, question: string, documentIds?: string[]): Promise<ChatMessageDto> {
+export function askAllQuestion(
+  token: string,
+  question: string,
+  documentIds?: string[],
+  isDraftRequest?: boolean,
+): Promise<ChatMessageDto> {
   return fetch(`${API_BASE_URL}/api/documents/ask-all`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-    body: JSON.stringify({ question, documentIds }),
+    body: JSON.stringify({ question, documentIds, isDraftRequest }),
   }).then((r) => handleResponse(r))
 }
 

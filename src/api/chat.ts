@@ -10,6 +10,7 @@ export interface ChatMessage {
   deadlineAmount?: number | null
   deadlineUnit?: string | null
   deadlineComputedDueDate?: string
+  isDraftRequest?: boolean
   error?: string
   pending: boolean
 }

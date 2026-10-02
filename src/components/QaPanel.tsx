@@ -21,7 +21,7 @@ interface QaPanelProps {
   multiMode?: boolean
   messages: ChatMessage[]
   asking: boolean
-  onAsk: (question: string) => void
+  onAsk: (question: string, isDraftRequest?: boolean) => void
 }
 
 function addToDate(startDate: string, amount: number, unit: string): string | null {
@@ -39,6 +39,7 @@ function addToDate(startDate: string, amount: number, unit: string): string | nu
 
 export function QaPanel({ document, multiMode = false, messages, asking, onAsk }: QaPanelProps) {
   const [question, setQuestion] = useState('')
+  const [draftMode, setDraftMode] = useState(false)
   const [deadlineInputs, setDeadlineInputs] = useState<Record<string, string>>({})
   const [computedDueDates, setComputedDueDates] = useState<Record<string, string>>({})
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -75,7 +76,7 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
     event.preventDefault()
     const trimmed = question.trim()
     if (!trimmed || asking) return
-    onAsk(trimmed)
+    onAsk(trimmed, draftMode)
     setQuestion('')
   }
 
@@ -119,7 +120,8 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
             {message.error && <div className="chat-answer error">{message.error}</div>}
 
             {message.answer && (
-              <div className="chat-answer">
+              <div className={`chat-answer${message.isDraftRequest ? ' chat-answer-draft' : ''}`}>
+                {message.isDraftRequest && <span className="draft-badge">📄 Nacrt</span>}
                 {message.confidence && (
                   <span className={`confidence-badge confidence-${message.confidence.toLowerCase()}`}>
                     {confidenceLabels[message.confidence] ?? message.confidence}
@@ -197,18 +199,41 @@ export function QaPanel({ document, multiMode = false, messages, asking, onAsk }
         ))}
       </div>
 
+      <div className="mode-toggle-row">
+        <button
+          type="button"
+          className={`mode-toggle-button ${!draftMode ? 'active' : ''}`}
+          onClick={() => setDraftMode(false)}
+        >
+          💬 Pitanje
+        </button>
+        <button
+          type="button"
+          className={`mode-toggle-button ${draftMode ? 'active' : ''}`}
+          onClick={() => setDraftMode(true)}
+        >
+          📄 Nacrt dopisa/rešenja
+        </button>
+      </div>
+
       <form className="chat-form" onSubmit={handleSubmit}>
         <textarea
           ref={textareaRef}
           rows={1}
-          placeholder={multiMode ? 'Postavi pitanje o svim dokumentima…' : 'Postavi pitanje o dokumentu…'}
+          placeholder={
+            draftMode
+              ? 'Opiši šta nacrt treba da sadrži (npr. nacrt rešenja o razrešenju, žalba na presudu…)'
+              : multiMode
+                ? 'Postavi pitanje o svim dokumentima…'
+                : 'Postavi pitanje o dokumentu…'
+          }
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={asking}
         />
         <button type="submit" disabled={asking || !question.trim()}>
-          {asking ? 'Šalje se…' : 'Pošalji'}
+          {asking ? 'Šalje se…' : draftMode ? 'Napravi nacrt' : 'Pošalji'}
         </button>
       </form>
     </main>

@@ -76,6 +76,7 @@ function App() {
             confidenceNote: m.confidenceNote,
             deadlineAmount: m.deadlineAmount,
             deadlineUnit: m.deadlineUnit,
+            isDraftRequest: m.isDraftRequest,
             pending: false,
           })),
         }))
@@ -183,7 +184,7 @@ function App() {
     setPreviewError(null)
   }
 
-  async function handleAsk(question: string) {
+  async function handleAsk(question: string, isDraftRequest?: boolean) {
     if (!session || !selectedId) return
     const token = session.token
     const documentId = selectedId
@@ -198,8 +199,8 @@ function App() {
     try {
       const result =
         documentId === ALL_DOCUMENTS_ID
-          ? await askAllQuestion(token, question)
-          : await askQuestion(token, documentId, question)
+          ? await askAllQuestion(token, question, undefined, isDraftRequest)
+          : await askQuestion(token, documentId, question, isDraftRequest)
       setChatByDocument((prev) => ({
         ...prev,
         [documentId]: (prev[documentId] ?? []).map((m) =>
@@ -213,6 +214,7 @@ function App() {
                 confidenceNote: result.confidenceNote,
                 deadlineAmount: result.deadlineAmount,
                 deadlineUnit: result.deadlineUnit,
+                isDraftRequest: result.isDraftRequest,
               }
             : m,
         ),
